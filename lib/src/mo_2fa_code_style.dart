@@ -35,6 +35,20 @@ typedef Mo2FACellDecorationBuilder = InputDecoration Function(
   required bool hasError,
 });
 
+/// Builds an optional widget shown between cell [index] and the next cell.
+///
+/// Return `null` to render nothing at that position. Useful to group cells,
+/// e.g. a dash in the middle of a 6-digit code:
+///
+/// ```dart
+/// separatorBuilder: (context, index) =>
+///     index == 2 ? const Text('-') : null,
+/// ```
+typedef Mo2FASeparatorBuilder = Widget? Function(
+  BuildContext context,
+  int index,
+);
+
 /// Visual configuration for a [Mo2FACodeField].
 ///
 /// Every property has a sensible Material 3 default, so `const
@@ -59,12 +73,18 @@ class Mo2FACodeStyle {
     this.spacing = 12,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.textStyle,
+    this.hintCharacter,
+    this.hintStyle,
     this.decoration,
     this.decorationBuilder,
+    this.separatorBuilder,
     this.cursorColor,
     this.obscuringCharacter = '•',
     this.errorTextStyle,
-  });
+  }) : assert(
+          hintCharacter == null || hintCharacter.length == 1,
+          'hintCharacter must be a single character',
+        );
 
   /// Width of each cell.
   final double cellWidth;
@@ -81,6 +101,18 @@ class Mo2FACodeStyle {
   /// Text style of the typed character. Defaults to the theme's `titleLarge`.
   final TextStyle? textStyle;
 
+  /// A single placeholder character shown in every empty cell, e.g. `'0'`
+  /// or `'-'`. Disappears as soon as the cell is filled.
+  ///
+  /// `null` (the default) shows no hint.
+  final String? hintCharacter;
+
+  /// Text style of [hintCharacter].
+  ///
+  /// Defaults to [textStyle] (or the theme's `titleLarge`) in the theme's
+  /// hint color.
+  final TextStyle? hintStyle;
+
   /// A single decoration applied to every cell.
   ///
   /// Ignored when [decorationBuilder] is provided.
@@ -88,6 +120,12 @@ class Mo2FACodeStyle {
 
   /// Per-cell decoration builder. Takes precedence over [decoration].
   final Mo2FACellDecorationBuilder? decorationBuilder;
+
+  /// Optional widget between cells, e.g. a dash grouping the code.
+  ///
+  /// Called with the index of the cell to the left; return `null` for no
+  /// separator at that position. [spacing] still applies around separators.
+  final Mo2FASeparatorBuilder? separatorBuilder;
 
   /// Cursor color inside the cells.
   final Color? cursorColor;

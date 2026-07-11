@@ -124,6 +124,49 @@ void main() {
     expect(formKey.currentState!.validate(), isTrue);
   });
 
+  testWidgets('hintCharacter renders in every cell', (tester) async {
+    await tester.pumpWidget(_wrap(Mo2FACodeField(
+      length: 4,
+      style: const Mo2FACodeStyle(hintCharacter: '0'),
+    )));
+
+    expect(find.text('0'), findsNWidgets(4));
+    for (var i = 0; i < 4; i++) {
+      expect(
+        tester
+            .widget<TextField>(find.byType(TextField).at(i))
+            .decoration
+            ?.hintText,
+        '0',
+      );
+    }
+  });
+
+  testWidgets('separatorBuilder inserts widgets between cells',
+      (tester) async {
+    await tester.pumpWidget(_wrap(Mo2FACodeField(
+      length: 6,
+      style: Mo2FACodeStyle(
+        separatorBuilder: (context, index) =>
+            index == 2 ? const Text('-') : null,
+      ),
+    )));
+
+    expect(find.byType(TextField), findsNWidgets(6));
+    expect(find.text('-'), findsOneWidget);
+  });
+
+  testWidgets('readOnly is applied to every cell', (tester) async {
+    await tester.pumpWidget(_wrap(Mo2FACodeField(length: 4, readOnly: true)));
+
+    for (var i = 0; i < 4; i++) {
+      expect(
+        tester.widget<TextField>(find.byType(TextField).at(i)).readOnly,
+        isTrue,
+      );
+    }
+  });
+
   testWidgets('controller reads, sets and clears the code', (tester) async {
     final controller = Mo2FACodeController();
     addTearDown(controller.dispose);

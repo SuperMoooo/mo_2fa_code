@@ -68,6 +68,8 @@ class Mo2FACodeField extends FormField<String> {
     this.caseTransform = Mo2FACaseTransform.none,
     this.obscureText = false,
     this.autoFocus = false,
+    this.readOnly = false,
+    this.hapticFeedback = false,
     this.keyboardType,
     this.autofillHints = const [AutofillHints.oneTimeCode],
     this.style = const Mo2FACodeStyle(),
@@ -103,6 +105,16 @@ class Mo2FACodeField extends FormField<String> {
 
   /// Focus the first cell as soon as the field appears.
   final bool autoFocus;
+
+  /// Show the code without allowing edits.
+  ///
+  /// Unlike `enabled: false`, the cells keep their normal look and remain
+  /// focusable; the keyboard just never opens.
+  final bool readOnly;
+
+  /// Play a light haptic impact on every accepted character (typed or
+  /// pasted). Off by default.
+  final bool hapticFeedback;
 
   /// Overrides the keyboard type derived from [inputType].
   final TextInputType? keyboardType;
@@ -239,6 +251,8 @@ class _Mo2FACodeFieldState extends FormFieldState<String> {
       return;
     }
 
+    if (_widget.hapticFeedback) HapticFeedback.lightImpact();
+
     // Paste or autofill.
     if (text.length > 1) {
       _applyCode(text, from: index);
@@ -359,9 +373,68 @@ class _Mo2FACodeFieldState extends FormFieldState<String> {
     );
   }
 
+  Widget _buildCell(int index, ThemeData theme) {
+    final style = _widget.style;
+    var decoration = style.decorationBuilder?.call(
+          context,
+          index,
+          hasFocus: _nodes[index].hasFocus,
+          hasError: hasError,
+        ) ??
+        style.decoration ??
+        _defaultDecoration(theme, hasError);
+
+    if (style.hintCharacter != null && decoration.hintText == null) {
+      decoration = decoration.copyWith(
+        hintText: style.hintCharacter,
+        hintStyle: style.hintStyle ??
+            (style.textStyle ?? theme.textTheme.titleLarge)
+                ?.copyWith(color: theme.hintColor),
+      );
+    }
+
+    return SizedBox(
+      width: style.cellWidth,
+      height: style.cellHeight,
+      child: TextField(
+        controller: _cells[index],
+        focusNode: _nodes[index],
+        enabled: _widget.enabled,
+        readOnly: _widget.readOnly,
+        autofocus: _widget.autoFocus && index == 0,
+        textAlign: TextAlign.center,
+        style: style.textStyle ?? theme.textTheme.titleLarge,
+        keyboardType: _keyboardType,
+        textCapitalization:
+            _widget.caseTransform == Mo2FACaseTransform.upperCase
+                ? TextCapitalization.characters
+                : TextCapitalization.none,
+        obscureText: _widget.obscureText,
+        obscuringCharacter: style.obscuringCharacter,
+        cursorColor: style.cursorColor,
+        autocorrect: false,
+        enableSuggestions: false,
+        autofillHints: index == 0 && _widget.autofillHints.isNotEmpty
+            ? _widget.autofillHints
+            : null,
+        decoration: decoration,
+        onChanged: (value) => _onCellChanged(value, index),
+      ),
+    );
+  }
+
   Widget _buildCells() {
     final style = _widget.style;
     final theme = Theme.of(context);
+
+    final children = <Widget>[];
+    for (var index = 0; index < _widget.length; index++) {
+      children.add(_buildCell(index, theme));
+      if (index < _widget.length - 1) {
+        final separator = style.separatorBuilder?.call(context, index);
+        if (separator != null) children.add(separator);
+      }
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -369,44 +442,7 @@ class _Mo2FACodeFieldState extends FormFieldState<String> {
         Row(
           mainAxisAlignment: style.mainAxisAlignment,
           spacing: style.spacing,
-          children: List.generate(_widget.length, (index) {
-            final decoration = style.decorationBuilder?.call(
-                  context,
-                  index,
-                  hasFocus: _nodes[index].hasFocus,
-                  hasError: hasError,
-                ) ??
-                style.decoration ??
-                _defaultDecoration(theme, hasError);
-
-            return SizedBox(
-              width: style.cellWidth,
-              height: style.cellHeight,
-              child: TextField(
-                controller: _cells[index],
-                focusNode: _nodes[index],
-                enabled: _widget.enabled,
-                autofocus: _widget.autoFocus && index == 0,
-                textAlign: TextAlign.center,
-                style: style.textStyle ?? theme.textTheme.titleLarge,
-                keyboardType: _keyboardType,
-                textCapitalization:
-                    _widget.caseTransform == Mo2FACaseTransform.upperCase
-                        ? TextCapitalization.characters
-                        : TextCapitalization.none,
-                obscureText: _widget.obscureText,
-                obscuringCharacter: style.obscuringCharacter,
-                cursorColor: style.cursorColor,
-                autocorrect: false,
-                enableSuggestions: false,
-                autofillHints: index == 0 && _widget.autofillHints.isNotEmpty
-                    ? _widget.autofillHints
-                    : null,
-                decoration: decoration,
-                onChanged: (value) => _onCellChanged(value, index),
-              ),
-            );
-          }),
+          children: children,
         ),
         if (hasError)
           Padding(

@@ -65,10 +65,12 @@ class _TwoFAScreenState extends State<TwoFAScreen> {
                   autoFocus: true,
                   inputType: Mo2FAInputType.alphanumeric,
                   caseTransform: Mo2FACaseTransform.upperCase,
+                  hapticFeedback: true,
                   style: const Mo2FACodeStyle(
                     cellWidth: 52,
                     cellHeight: 60,
                     spacing: 10,
+                    hintCharacter: '-',
                     textStyle: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

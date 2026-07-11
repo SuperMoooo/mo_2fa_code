@@ -15,6 +15,9 @@ for free:
   exactly like with `TextFormField`
 - **Input filtering** — numeric, alphanumeric or any characters, with optional
   upper/lower case transform
+- **Hint character** — a placeholder shown in every empty cell
+- **Separators** — group cells with any widget, e.g. `123 - 456`
+- Optional **haptic feedback** on every accepted character
 - Optional **controller** to read, set or clear the code programmatically
 
 ## Usage
@@ -71,8 +74,22 @@ Mo2FACodeField(
     cellWidth: 56,
     cellHeight: 64,
     spacing: 8,
+    hintCharacter: '0', // placeholder shown in every empty cell
     textStyle: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
     cursorColor: Colors.indigo,
+  ),
+)
+```
+
+Group the cells with a separator widget:
+
+```dart
+Mo2FACodeField(
+  length: 6,
+  style: Mo2FACodeStyle(
+    // renders 3 cells, a dash, then 3 cells
+    separatorBuilder: (context, index) =>
+        index == 2 ? const Text('—') : null,
   ),
 )
 ```
@@ -107,8 +124,10 @@ Mo2FACodeStyle(
 | `validator` | — | Standard `FormField` validator, receives the full code string |
 | `obscureText` | `false` | Hide characters (see `Mo2FACodeStyle.obscuringCharacter`) |
 | `autoFocus` | `false` | Focus the first cell on mount |
+| `readOnly` | `false` | Show the code without allowing edits |
+| `hapticFeedback` | `false` | Light haptic impact on every accepted character |
 | `keyboardType` | derived | Override the keyboard derived from `inputType` |
 | `autofillHints` | `[oneTimeCode]` | Autofill hints for the first cell; pass `[]` to disable |
-| `style` | `Mo2FACodeStyle()` | Cell size, spacing, text style, decoration, error style |
+| `style` | `Mo2FACodeStyle()` | Cell size, spacing, hint character, text style, decoration, separators, error style |
 
 See the [example](example/lib/main.dart) for a complete 2FA screen.
