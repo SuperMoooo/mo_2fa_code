@@ -3,7 +3,9 @@ import 'package:mo_2fa_code/mo_2fa_code.dart';
 
 void main() => runApp(const ExampleApp());
 
+/// Root of the example app.
 class ExampleApp extends StatelessWidget {
+  /// Creates the example app.
   const ExampleApp({super.key});
 
   @override
@@ -16,7 +18,9 @@ class ExampleApp extends StatelessWidget {
   }
 }
 
+/// A complete 2FA screen built with [Mo2FACodeField].
 class TwoFAScreen extends StatefulWidget {
+  /// Creates the 2FA screen.
   const TwoFAScreen({super.key});
 
   @override
@@ -34,9 +38,9 @@ class _TwoFAScreenState extends State<TwoFAScreen> {
   }
 
   Future<void> _verify(String code) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Verifying code $code...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Verifying code $code...')));
     // On failure, clear the field so the user can retry:
     // _codeController.clear();
   }

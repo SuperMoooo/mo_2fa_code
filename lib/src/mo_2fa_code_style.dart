@@ -52,6 +52,7 @@ typedef Mo2FACellDecorationBuilder = InputDecoration Function(
 /// decoration for every cell) or [decorationBuilder] (per-cell, focus and
 /// error aware).
 class Mo2FACodeStyle {
+  /// Creates a style. Every parameter has a Material 3 default.
   const Mo2FACodeStyle({
     this.cellWidth = 48,
     this.cellHeight = 56,

@@ -57,6 +57,7 @@ class Mo2FACodeController extends ChangeNotifier {
 /// )
 /// ```
 class Mo2FACodeField extends FormField<String> {
+  /// Creates a code input with [length] cells.
   Mo2FACodeField({
     super.key,
     this.length = 6,
