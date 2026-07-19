@@ -15,6 +15,9 @@ for free:
   exactly like with `TextFormField`
 - **Input filtering** — numeric, alphanumeric or any characters, with optional
   upper/lower case transform
+- **Variants & shapes** — pick a color role (primary / secondary / tertiary /
+  error) and a border shape (filled / outlined / underline / rounded); every
+  color derives from the one accent
 - **Hint character** — a placeholder shown in every empty cell
 - **Separators** — group cells with any widget, e.g. `123 - 456`
 - Optional **haptic feedback** on every accepted character
@@ -81,6 +84,40 @@ Mo2FACodeField(
 )
 ```
 
+#### Variants and shapes
+
+Without any custom decoration, the cells are painted from a **variant** (color
+role) and a **shape** (border style). Every color — border, focus ring and fill
+tint — derives from the one accent color, so the field stays consistent.
+
+```dart
+Mo2FACodeField(
+  length: 6,
+  style: const Mo2FACodeStyle(
+    variant: Mo2FACellVariant.secondary, // primary | secondary | tertiary | error
+    shape: Mo2FACellShape.rounded,       // filled | outlined | underline | rounded
+  ),
+)
+```
+
+| `variant` | Color pulled from the theme's `ColorScheme` |
+| --- | --- |
+| `primary` | `colorScheme.primary` (default) |
+| `secondary` | `colorScheme.secondary` |
+| `tertiary` | `colorScheme.tertiary` |
+| `error` | `colorScheme.error` |
+
+| `shape` | Look |
+| --- | --- |
+| `outlined` | Transparent with a visible border at rest (default) |
+| `filled` | Faint tint of the variant, borderless until focused |
+| `rounded` | Like `filled`, with a pill radius |
+| `underline` | Bottom border only, no fill |
+
+When the field fails validation, the cells switch to the theme's error color
+regardless of the chosen variant. These options are ignored if you supply your
+own `decoration` or `decorationBuilder`.
+
 Group the cells with a separator widget:
 
 ```dart
@@ -128,6 +165,17 @@ Mo2FACodeStyle(
 | `hapticFeedback` | `false` | Light haptic impact on every accepted character |
 | `keyboardType` | derived | Override the keyboard derived from `inputType` |
 | `autofillHints` | `[oneTimeCode]` | Autofill hints for the first cell; pass `[]` to disable |
-| `style` | `Mo2FACodeStyle()` | Cell size, spacing, hint character, text style, decoration, separators, error style |
+| `style` | `Mo2FACodeStyle()` | Cell size, spacing, variant, shape, hint character, text style, decoration, separators, error style |
+
+`Mo2FACodeStyle` highlights:
+
+| Style parameter | Default | Description |
+| --- | --- | --- |
+| `variant` | `primary` | Color role of the built-in decoration: `primary`, `secondary`, `tertiary`, `error` |
+| `shape` | `outlined` | Border shape: `outlined`, `filled`, `rounded`, `underline` |
+| `cellWidth` / `cellHeight` | `48` / `56` | Size of each cell |
+| `spacing` | `12` | Horizontal gap between cells |
+| `hintCharacter` | — | Placeholder shown in every empty cell |
+| `decoration` / `decorationBuilder` | — | Full control per cell; overrides `variant` + `shape` |
 
 See the [example](example/lib/main.dart) for a complete 2FA screen.

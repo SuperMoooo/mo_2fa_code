@@ -12,6 +12,52 @@ enum Mo2FAInputType {
   any,
 }
 
+/// Color role of a code cell.
+///
+/// Every color the built-in decoration paints — border, focus ring and fill
+/// tint — is derived from the variant, so a [Mo2FACellVariant.secondary] field
+/// is secondary all over. Resolved against the theme's `colorScheme`.
+///
+/// Only used when the style provides no explicit [Mo2FACodeStyle.decoration]
+/// or [Mo2FACodeStyle.decorationBuilder].
+enum Mo2FACellVariant {
+  /// Uses `colorScheme.primary`.
+  primary,
+
+  /// Uses `colorScheme.secondary`.
+  secondary,
+
+  /// Uses `colorScheme.tertiary`.
+  tertiary,
+
+  /// Uses `colorScheme.error`.
+  error,
+}
+
+/// Border shape of a code cell.
+///
+/// - [filled]: filled with a faint tint of the variant, borderless until
+///   focused.
+/// - [outlined]: transparent with a visible border at rest.
+/// - [underline]: bottom border only, no fill.
+/// - [rounded]: like [filled], with a pill radius.
+///
+/// Only used when the style provides no explicit [Mo2FACodeStyle.decoration]
+/// or [Mo2FACodeStyle.decorationBuilder].
+enum Mo2FACellShape {
+  /// Filled with a faint tint of the variant, borderless until focused.
+  filled,
+
+  /// Transparent with a visible border at rest.
+  outlined,
+
+  /// Bottom border only, no fill.
+  underline,
+
+  /// Like [filled], with a pill radius.
+  rounded,
+}
+
 /// How typed characters are transformed before being stored.
 enum Mo2FACaseTransform {
   /// Keep characters exactly as typed.
@@ -71,6 +117,8 @@ class Mo2FACodeStyle {
     this.cellWidth = 48,
     this.cellHeight = 56,
     this.spacing = 12,
+    this.variant = Mo2FACellVariant.primary,
+    this.shape = Mo2FACellShape.outlined,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.textStyle,
     this.hintCharacter,
@@ -94,6 +142,16 @@ class Mo2FACodeStyle {
 
   /// Horizontal gap between cells.
   final double spacing;
+
+  /// Color role of the built-in cell decoration. See [Mo2FACellVariant].
+  ///
+  /// Ignored when [decoration] or [decorationBuilder] is provided.
+  final Mo2FACellVariant variant;
+
+  /// Border shape of the built-in cell decoration. See [Mo2FACellShape].
+  ///
+  /// Ignored when [decoration] or [decorationBuilder] is provided.
+  final Mo2FACellShape shape;
 
   /// How the row of cells is aligned.
   final MainAxisAlignment mainAxisAlignment;

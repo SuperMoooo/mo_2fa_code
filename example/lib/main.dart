@@ -70,6 +70,8 @@ class _TwoFAScreenState extends State<TwoFAScreen> {
                     cellWidth: 52,
                     cellHeight: 60,
                     spacing: 10,
+                    variant: Mo2FACellVariant.primary,
+                    shape: Mo2FACellShape.rounded,
                     hintCharacter: '-',
                     textStyle: TextStyle(
                       fontSize: 24,

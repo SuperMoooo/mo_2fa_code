@@ -1,6 +1,6 @@
 name: mo_2fa_code
 description: 'A customizable 2FA / OTP code input for Flutter. Set the length and cell style; get auto-advance, backspace navigation, paste and autofill for free.'
-version: 0.1.0
+version: 0.1.1
 homepage: https://supermoooo.github.io/Portfolio/
 repository: https://github.com/SuperMoooo/mo_2fa_code
 

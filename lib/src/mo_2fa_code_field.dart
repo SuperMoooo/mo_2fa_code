@@ -346,30 +346,67 @@ class _Mo2FACodeFieldState extends FormFieldState<String> {
         : TextInputType.text;
   }
 
+  // Tuning for the built-in variant/shape decoration.
+  static const double _idleBorderWidth = 1;
+  static const double _focusedBorderWidth = 2;
+  static const double _idleBorderOpacity = 0.4;
+  static const double _fillOpacity = 0.06;
+  static const double _disabledOpacity = 0.38;
+  static const double _outlineRadius = 12;
+  static const double _pillRadius = 100;
+
+  Color _accentOf(ColorScheme scheme, Mo2FACellVariant variant) =>
+      switch (variant) {
+        Mo2FACellVariant.primary => scheme.primary,
+        Mo2FACellVariant.secondary => scheme.secondary,
+        Mo2FACellVariant.tertiary => scheme.tertiary,
+        Mo2FACellVariant.error => scheme.error,
+      };
+
+  InputBorder _cellBorder(Mo2FACellShape shape, Color color, double width) {
+    final side = BorderSide(color: color, width: width);
+    if (shape == Mo2FACellShape.underline) {
+      return UnderlineInputBorder(borderSide: side);
+    }
+    final radius = BorderRadius.circular(
+      shape == Mo2FACellShape.rounded ? _pillRadius : _outlineRadius,
+    );
+    return OutlineInputBorder(borderRadius: radius, borderSide: side);
+  }
+
+  /// Built-in decoration derived entirely from the style's variant + shape.
+  ///
+  /// [hasError] overrides the variant color with the theme's error color so a
+  /// failed field reads as an error regardless of the chosen variant.
   InputDecoration _defaultDecoration(ThemeData theme, bool hasError) {
-    final radius = BorderRadius.circular(12);
-    final colors = theme.colorScheme;
+    final style = _widget.style;
+    final scheme = theme.colorScheme;
+    final accent =
+        hasError ? scheme.error : _accentOf(scheme, style.variant);
+    final shape = style.shape;
+    final filled =
+        shape == Mo2FACellShape.filled || shape == Mo2FACellShape.rounded;
+
+    // Filled cells carry their color in the fill, so they stay borderless
+    // until focused; outlined/underline need a visible resting edge.
+    final idleColor = filled
+        ? Colors.transparent
+        : accent.withValues(alpha: _idleBorderOpacity);
+    final disabledColor =
+        scheme.onSurface.withValues(alpha: _disabledOpacity / 2);
+    final baseFill = theme.inputDecorationTheme.fillColor ?? scheme.surface;
+
     return InputDecoration(
       counterText: '',
       contentPadding: EdgeInsets.zero,
-      border: OutlineInputBorder(borderRadius: radius),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: radius,
-        borderSide: BorderSide(
-          color: hasError ? colors.error : colors.outline,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: radius,
-        borderSide: BorderSide(
-          color: hasError ? colors.error : colors.primary,
-          width: 2,
-        ),
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderRadius: radius,
-        borderSide: BorderSide(color: colors.outlineVariant),
-      ),
+      filled: filled,
+      fillColor: filled
+          ? Color.alphaBlend(accent.withValues(alpha: _fillOpacity), baseFill)
+          : Colors.transparent,
+      border: _cellBorder(shape, idleColor, _idleBorderWidth),
+      enabledBorder: _cellBorder(shape, idleColor, _idleBorderWidth),
+      focusedBorder: _cellBorder(shape, accent, _focusedBorderWidth),
+      disabledBorder: _cellBorder(shape, disabledColor, _idleBorderWidth),
     );
   }
 
